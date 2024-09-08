@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App Prototype</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #87CEEB;
+            color: black;
+        }
+        .weather-app {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        .location {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0;
+        }
+        .sub-location {
+            font-size: 18px;
+            margin: 0;
+        }
+        .sun {
+            width: 80px;
+            height: 80px;
+            background-color: #FFD700;
+            border-radius: 50%;
+            position: relative;
+            margin-right: auto;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+        }
+        .sun::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 110px;
+            height: 110px;
+            transform: translate(-50%, -50%);
+            border: 2px solid #FFD700;
+            border-radius: 50%;
+        }
+        .sun-ray {
+            position: absolute;
+            width: 2px;
+            height: 20px;
+            background-color: #FFD700;
+            top: 50%;
+            left: 50%;
+            transform-origin: bottom;
+        }
+        .sun-ray:nth-child(1) { transform: translateX(-50%) translateY(-50px) rotate(0deg); }
+        .sun-ray:nth-child(2) { transform: translateX(-50%) translateY(-50px) rotate(45deg); }
+        .sun-ray:nth-child(3) { transform: translateX(-50%) translateY(-50px) rotate(90deg); }
+        .sun-ray:nth-child(4) { transform: translateX(-50%) translateY(-50px) rotate(135deg); }
+        .sun-ray:nth-child(5) { transform: translateX(-50%) translateY(-50px) rotate(180deg); }
+        .sun-ray:nth-child(6) { transform: translateX(-50%) translateY(-50px) rotate(225deg); }
+        .sun-ray:nth-child(7) { transform: translateX(-50%) translateY(-50px) rotate(270deg); }
+        .sun-ray:nth-child(8) { transform: translateX(-50%) translateY(-50px) rotate(315deg); }
+        .temperature {
+            font-size: 72px;
+            font-weight: bold;
+            margin: 20px 0 0 0;
+        }
+        .feels-like {
+            font-size: 24px;
+            margin: 0 0 20px 0;
+        }
+        .main-content {
+            display: flex;
+            justify-content: space-between;
+        }
+        .hourly-forecast {
+            width: 80px;
+            border: 2px solid rgba(255,255,255,0.5);
+            border-radius: 10px;
+            padding: 10px;
+        }
+        .forecast-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+        }
+        .forecast-item:last-child {
+            border-bottom: none;
+        }
+        .forecast-item.highlight-yellow {
+            background-color: rgba(255, 255, 0, 0.3);
+            border-radius: 5px;
+        }
+        .forecast-item.highlight-darkblue {
+            background-color: rgba(0, 0, 139, 0.3);
+            border-radius: 5px;
+        }
+        .forecast-time, .forecast-temp {
+            font-size: 16px;
+        }
+        .forecast-icon {
+            width: 30px;
+            height: 30px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .sun-icon {
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23FFD700"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>');
+        }
+        .cloud-icon {
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23FFFFFF"><path d="M18.5 10H18c-.3-3-2.9-5-5.9-5-2.8 0-5.3 2-5.8 4.7h-.3C3.7 9.7 2 11.4 2 13.5c0 2.1 1.7 3.8 3.8 3.8h12.9c1.9 0 3.4-1.5 3.4-3.4-.1-1.9-1.6-3.4-3.6-3.9z"/></svg>');
+        }
+        .rain-icon {
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%2387CEFA"><path d="M12 2c-5.5 0-10 4.5-10 10 0 5.5 4.5 10 10 10s10-4.5 10-10c0-5.5-4.5-10-10-10zm0 18c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8zm-1-14l-3 6h3l-2 6 7-9h-4l3-3h-4z"/></svg>');
+        }
+        .daily-forecast {
+            flex-grow: 1;
+            margin-left: 20px;
+            border: 2px solid rgba(255,255,255,0.5);
+            border-radius: 10px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+        .forecast-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+        }
+        .forecast-row:last-child {
+            border-bottom: none;
+        }
+        .tabs {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .tab {
+            background-color: rgba(255,255,255,0.3);
+            border: none;
+            border-radius: 20px;
+            padding: 5px 15px;
+            font-size: 16px;
+            color: black;
+        }
+        .tab.active {
+            background-color: rgba(255,255,255,0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="weather-app">
+        <div class="header">
+            <div class="sun">
+                <div class="sun-ray"></div>
+                <div class="sun-ray"></div>
+                <div class="sun-ray"></div>
+                <div class="sun-ray"></div>
+                <div class="sun-ray"></div>
+                <div class="sun-ray"></div>
+                <div class="sun-ray"></div>
+                <div class="sun-ray"></div>
+            </div>
+            <div>
+                <p class="location">My Location</p>
+                <p class="sub-location">Philadelphia, Pa</p>
+            </div>
+        </div>
+        <p class="temperature">IS 70°F</p>
+        <p class="feels-like">Feels Like 67°F</p>
+        <div class="main-content">
+            <div class="hourly-forecast">
+                <div class="forecast-item highlight-yellow">
+                    <span class="forecast-time">10am</span>
+                    <div class="forecast-icon sun-icon"></div>
+                    <span class="forecast-temp">70</span>
+                </div>
+                <div class="forecast-item">
+                    <span class="forecast-time">11am</span>
+                    <div class="forecast-icon cloud-icon"></div>
+                    <span class="forecast-temp">69</span>
+                </div>
+                <div class="forecast-item">
+                    <span class="forecast-time">12pm</span>
+                    <div class="forecast-icon cloud-icon"></div>
+                    <span class="forecast-temp">68</span>
+                </div>
+                <div class="forecast-item">
+                    <span class="forecast-time">1pm</span>
+                    <div class="forecast-icon cloud-icon"></div>
+                    <span class="forecast-temp">68</span>
+                </div>
+                <div class="forecast-item">
+                    <span class="forecast-time">2pm</span>
+                    <div class="forecast-icon cloud-icon"></div>
+                    <span class="forecast-temp">67</span>
+                </div>
+                <div class="forecast-item highlight-darkblue">
+                    <span class="forecast-time">3pm</span>
+                    <div class="forecast-icon cloud-icon"></div>
+                    <span class="forecast-temp">67</span>
+                </div>
+            </div>
+            <div class="daily-forecast">
+                <div class="tabs">
+                    <button class="tab active">8 Day</button>
+                    <button class="tab">10 Day</button>
+                    <button class="tab">20 Day</button>
+                </div>
+                <div class="forecast-row">
+                    <span class="forecast-time">Mon 9/9</span>
+                    <div class="forecast-icon sun-icon"></div>
+                    <span class="forecast-temp">70</span>
+                </div>
+                <div class="forecast-row">
+                    <span class="forecast-time">Tue 9/10</span>
+                    <div class="forecast-icon sun-icon"></div>
+                    <span class="forecast-temp">76</span>
+                </div>
+                <div class="forecast-row">
+                    <span class="forecast-time">Wed 9/11</span>
+                    <div class="forecast-icon cloud-icon"></div>
+                    <span class="forecast-temp">71</span>
+                </div>
+                <div class="forecast-row">
+                    <span class="forecast-time">Thur 9/12</span>
+                    <div class="forecast-icon cloud-icon"></div>
+                    <span class="forecast-temp">64</span>
+                </div>
+                <div class="forecast-row">
+                    <span class="forecast-time">Fri 9/13</span>
+                    <div class="forecast-icon cloud-icon"></div>
+                    <span class="forecast-temp">66</span>
+                </div>
+                <div class="forecast-row">
+                    <span class="forecast-time">Sat 9/14</span>
+                    <div class="forecast-icon cloud-icon"></div>
+                    <span class="forecast-temp">65</span>
+                </div>
+                <div class="forecast-row">
+                    <span class="forecast-time">Sun 9/15</span>
+                    <div class="forecast-icon cloud-icon"></div>
+                    <span class="forecast-temp">68</span>
+                </div>
+                <div class="forecast-row">
+                    <span class="forecast-time">Mon 9/16</span>
+                    <div class="forecast-icon sun-icon"></div>
+                    <span class="forecast-temp">73</span>
+                </div>
+                <div class="forecast-row">
+                    <span class="forecast-time">Tues 9/17</span>
+                    <div class="forecast-icon sun-icon"></div>
+                    <span class="forecast-temp">75</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
